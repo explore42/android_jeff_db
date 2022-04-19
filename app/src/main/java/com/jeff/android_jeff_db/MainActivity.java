@@ -8,9 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         addDatabase();
         queryDatabase();
 
-        //显示这个list view
+        //显示这个list
         initFruits();
 
-        //Stetho.initializeWithDefaults(this);//no use
+        //Stetho.initializeWithDefaults(this);//用于显示数据库，no use
     }
 
     private void createDatabase() {
@@ -105,13 +108,15 @@ public class MainActivity extends AppCompatActivity {
             fruitList.add(apple);
         }
 
-        FruitAdapter adapter = new FruitAdapter(
-                MainActivity.this,
-                R.layout.fruit_item,
-                fruitList
-        );
+        //ListView listview = (ListView) findViewById(R.id.list_view);
+        //listview.setAdapter(adapter);
 
-        ListView listview = (ListView) findViewById(R.id.list_view);
-        listview.setAdapter(adapter);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        FruitAdapter2 adapter = new FruitAdapter2(fruitList);
+        recyclerView.setAdapter(adapter);
+
     }
 }
