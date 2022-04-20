@@ -1,15 +1,13 @@
 package com.jeff.android_jeff_db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] data = {"apple", "banana", "orange", "Jeff"};
     private List<Fruit> fruitList = new ArrayList<>();
+    private List<Device> deviceList = new ArrayList<>();
+
+    //存放从数据库读出来的数据
+    //集合嵌套,https://blog.csdn.net/qq_36098284/article/details/79936335
+    private List<String> deviceListName = new ArrayList<String>();
+    private List<String> deviceListLo = new ArrayList<String>();
+    private List<String> deviceListLa = new ArrayList<String>();
+    private List<String> deviceListStatus = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,18 +42,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         dbHelper = new JeffDatabaseHelper(this, "Device", null, 2);//每次需要更改版本号
-        createDatabase();
-        addDatabase();
-        queryDatabase();
+        //createDatabase();
+        //addDatabase();
+        //queryDatabase();
 
         //显示这个list
-        initFruits();
+        //initFruits();
+        initDevices();
 
         //Stetho.initializeWithDefaults(this);//用于显示数据库，no use
     }
 
     private void createDatabase() {
         Button createDBButton = (Button) findViewById(R.id.create_database);
+        createDBButton.setVisibility(View.VISIBLE);
         createDBButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addDatabase() {
         Button addData = (Button) findViewById(R.id.add_data);
+        addData.setVisibility(View.VISIBLE);
         addData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void queryDatabase() {
         Button queryData = (Button) findViewById(R.id.query_data);
+        queryData.setVisibility(View.VISIBLE);
         queryData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
                 if (cursor.moveToFirst()) {
                     do {
                         //遍历全部对象
-                        String name = cursor.getString(cursor.getColumnIndex("name"));
-                        float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                        float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                        int status = cursor.getInt(cursor.getColumnIndex("status"));
+                        @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
+                        @SuppressLint("Range") float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
+                        @SuppressLint("Range") float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
+                        @SuppressLint("Range") int status = cursor.getInt(cursor.getColumnIndex("status"));
                         Log.d("DATABASE", "onClick: device name " + name);
                         Log.d("DATABASE", "onClick: device longitude " + longitude);
                         Log.d("DATABASE", "onClick: device latitude " + latitude);
@@ -103,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initFruits() {
-        for (int i = 0; i < 3; i++){//让数据充满屏幕
-            Fruit apple = new Fruit("Apple",R.drawable.apple);
+        for (int i = 0; i < 3; i++) {//让数据充满屏幕
+            Fruit apple = new Fruit("Apple", R.drawable.apple);
             fruitList.add(apple);
         }
 
@@ -118,5 +128,51 @@ public class MainActivity extends AppCompatActivity {
         FruitAdapter2 adapter = new FruitAdapter2(fruitList);
         recyclerView.setAdapter(adapter);
 
+    }
+
+    private void initDevices() {
+        //for (int i = 0; i < 5; i++) {//让数据充满屏幕
+        //    Device device1 = new Device("device_1", "100.123", "456.789", "1");
+        //    deviceList.add(device1);
+        //}
+
+        queryDatabaseToList();
+        for(int i = 0; i < deviceListName.size(); i++){
+            deviceList.add(new Device(deviceListName.get(i),deviceListLo.get(i),deviceListLa.get(i),deviceListStatus.get(i)));
+        }
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        DeviceAdapter adapter = new DeviceAdapter(deviceList);
+        recyclerView.setAdapter(adapter);
+    }
+
+    private void queryDatabaseToList() {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        //all data
+        Cursor cursor = db.query("Device", null, null, null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                //遍历全部对象
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
+                @SuppressLint("Range") float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
+                @SuppressLint("Range") float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
+                @SuppressLint("Range") int status = cursor.getInt(cursor.getColumnIndex("status"));
+                Log.d("DATABASE", "onClick: device name " + name);
+                Log.d("DATABASE", "onClick: device longitude " + longitude);
+                Log.d("DATABASE", "onClick: device latitude " + latitude);
+                Log.d("DATABASE", "onClick: device status " + status);
+
+                //装入集合之中
+                deviceListName.add(name);
+                deviceListLo.add(Float.toString(longitude));
+                deviceListLa.add(Float.toString(latitude));
+                deviceListStatus.add(Integer.toString(status));
+            }
+            while (cursor.moveToNext());
+        }
+        cursor.close();
     }
 }
