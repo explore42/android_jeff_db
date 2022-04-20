@@ -3,8 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/activity_main.xml" value="0.5" />
+        <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/activity_main.xml" value="0.121524201853759" />
+        <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/device_first.xml" value="1.5" />
         <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/device_item.xml" value="0.5" />
+        <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/device_overview.xml" value="0.5" />
         <entry key="..\:/Users/UESTC/Documents/Jeff/Andriod/android_jeff_db/app/src/main/res/layout/fruit_item.xml" value="0.1" />
       </map>
     </option>
