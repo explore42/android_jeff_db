@@ -9,6 +9,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -16,6 +19,9 @@ import java.util.List;
 
 public class MainActivity2 extends AppCompatActivity {
     private String triggerName;
+    private Float triggerLo;
+    private Float triggerLa;
+
     private JeffDatabaseHelper dbHelper;
 
     private List<String> deviceListName = new ArrayList<String>();
@@ -24,21 +30,26 @@ public class MainActivity2 extends AppCompatActivity {
 
     private List<DeviceDetail> deviceList = new ArrayList<>();
 
+    WebView locationMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
         triggerName = getIntent().getStringExtra("trigger_name");
+        triggerLo = getIntent().getFloatExtra("trigger_lo",1.000f);
+        triggerLa = getIntent().getFloatExtra("trigger_la",1.000f);
         //Log.e("intent",triggerName);
 
         TextView textView = (TextView) findViewById(R.id.textview_detial_cabinet_name);
         textView.setText(triggerName);
 
-        dbHelper = new JeffDatabaseHelper(this, "Device", null, 8);//每次需要更改版本号
+        dbHelper = new JeffDatabaseHelper(this, "Device", null, 12);//每次需要更改版本号
 
         queryDatabaseDevice();
         initDevices();
+        initMaps();
     }
 
     private void queryDatabaseDevice(){
@@ -80,5 +91,19 @@ public class MainActivity2 extends AppCompatActivity {
 
         DeviceDetailAdapter adapter = new DeviceDetailAdapter(deviceList);
         recyclerView.setAdapter(adapter);
+    }
+
+    private void initMaps(){
+        locationMap = (WebView) findViewById(R.id.webview_maps);
+        WebSettings webSettings = locationMap.getSettings();
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+        locationMap.getSettings().setJavaScriptEnabled(true);
+
+        //interface
+        locationMap.setWebViewClient(new WebViewClient());//用户点击的所有链接都会在您的 WebView 中加载
+        locationMap.addJavascriptInterface(new WebAppInterface(this,triggerLo,triggerLa), "Android");//绑定到Jscript，创建名为 Android 的接口
+
+        locationMap.loadUrl("file:///android_asset/web/index.html");
     }
 }

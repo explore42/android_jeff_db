@@ -38,6 +38,7 @@
         app:layout_constraintGuide_percent="0.3" />
 
     <WebView
+        android:id="@+id/webview_maps"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

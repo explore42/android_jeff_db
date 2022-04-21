@@ -77,9 +77,10 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
                 //放置触发切换视图的机柜名
                 intent.putExtra("trigger_name",holder.deviceName.getText().toString());
+                intent.putExtra("trigger_lo",Float.parseFloat(device.getLongitude()));//字符串转浮点数
+                intent.putExtra("trigger_la",Float.parseFloat(device.getLatitude()));
 
                 mContext.startActivity(intent);
-
             }
         });
 

@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.device_overview);//更改之后
 
-        dbHelper = new JeffDatabaseHelper(this, "Device", null, 8);//每次需要更改版本号
+        dbHelper = new JeffDatabaseHelper(this, "Device", null, 12);//每次需要更改版本号，有两个地方需要改
         //createDatabase();
         //addDatabase();
         //queryDatabase();
