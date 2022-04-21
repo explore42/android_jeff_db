@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,9 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         TextView deviceLatitude;
         TextView deviceStatus;
 
-        //注册点击事件
+        Button deviceMap;
+
+        //注册外层的点击事件
         View deviceView;
 
         public ViewHolder(View itemView) {
@@ -43,6 +46,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             deviceLongitude = (TextView) itemView.findViewById(R.id.device_longitude_overview);
             deviceLatitude = (TextView) itemView.findViewById(R.id.device_latitude_overview);
             deviceStatus = (TextView) itemView.findViewById(R.id.device_status_overview);
+
+            deviceMap = (Button) itemView.findViewById(R.id.device_map_button);
         }
     }
 
@@ -69,18 +74,30 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
                 Device device = mDeviceList.get(position);
                 //Toast.makeText(view.getContext(),"you click "+device.getName(),Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(mContext, MainActivity2.class);
+
+                //放置触发切换视图的机柜名
+                intent.putExtra("trigger_name",holder.deviceName.getText().toString());
+
                 mContext.startActivity(intent);
 
             }
         });
 
         //内部各个子项的点击
+        //点击这一项就不会触发外层的布局
         holder.deviceLongitude.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int position = holder.getAdapterPosition();
                 Device device = mDeviceList.get(position);
                 Toast.makeText(view.getContext(),"you click longitude "+device.getLongitude(),Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.deviceMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(view.getContext(),"进入地图",Toast.LENGTH_SHORT).show();
             }
         });
 
