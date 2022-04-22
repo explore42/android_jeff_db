@@ -57,4 +57,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.19" />
+
+    <Button
+        android:id="@+id/button_server_xml"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="服务器读取数据"
+        app:layout_constraintStart_toStartOf="@+id/guideline18"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

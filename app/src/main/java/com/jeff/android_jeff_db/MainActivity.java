@@ -83,23 +83,35 @@ public class MainActivity extends AppCompatActivity {
             "1", "1", "1", "0", "1", "1", "0", "1", "1", "0", "1", "1", "0", "1", "1", "0", "1", "0", "1", "1", "1", "1", "1", "1", "0", "1", "1", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0",
             "0", "0", "0", "0", "0", "0", "0"};
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //4022 用服务器更新数据
+    private ServerRequest serverRequest1;
+    private ServerRequest serverRequest2;
+    private int versionID = 13;//版本号
+    private String urlCabinet = "http://10.0.2.2/cabinet.xml";//对于模拟器的本地地址
+    private String urlDevice = "http://10.0.2.2/device.xml";
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.device_overview);//更改之后
 
-        dbHelper = new JeffDatabaseHelper(this, "Device", null, 12);//每次需要更改版本号，有两个地方需要改
+        dbHelper = new JeffDatabaseHelper(this, "Device", null, versionID);//每次需要更改版本号，有两个地方需要改
+
+        //0422
+        serverRequest1 = new ServerRequest(urlCabinet);//实例化
+        serverRequest2 = new ServerRequest(urlDevice);
+        ServerButton();
+
         //createDatabase();
         //addDatabase();
         //queryDatabase();
 
         //refreshDatabaseNew();//每次需要更改版本号
-        initCabinets();//initFruits();
-
-        //Stetho.initializeWithDefaults(this);//用于显示数据库，不能用
+        initCabinets();
     }
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private void createDatabase() {
@@ -167,23 +179,6 @@ public class MainActivity extends AppCompatActivity {
                 cursor.close();
             }
         });
-    }
-
-    private void initFruits() {
-        for (int i = 0; i < 3; i++) {//让数据充满屏幕
-            Fruit apple = new Fruit("Apple", R.drawable.apple);
-            fruitList.add(apple);
-        }
-
-        //ListView listview = (ListView) findViewById(R.id.list_view);
-        //listview.setAdapter(adapter);
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        FruitAdapter2 adapter = new FruitAdapter2(fruitList);
-        recyclerView.setAdapter(adapter);
     }
 
     private void initCabinets() {
@@ -254,10 +249,10 @@ public class MainActivity extends AppCompatActivity {
             values.clear();
         }
 
-        for (int i = 0;i < outDeviceName.length; i++){
+        for (int i = 0; i < outDeviceName.length; i++) {
             values.put("name", outDeviceName[i]);
             values.put("belong", outDeviceBelong[i]);
-            values.put("status",outDeviceStatus[i]);
+            values.put("status", outDeviceStatus[i]);
             db.insert("Device", null, values);
             values.clear();
         }
@@ -282,5 +277,31 @@ public class MainActivity extends AppCompatActivity {
             while (cursor.moveToNext());
         }
         cursor.close();
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //0422 通过服务器更新数据
+    private void ServerButton() {
+        Button button = (Button) findViewById(R.id.button_server_xml);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDataFromServer();
+            }
+        });
+    }
+
+    private void getDataFromServer() {
+        ArrayList<ArrayList<String>> test1 = new ArrayList<ArrayList<String>>();//注意类型
+        test1 = serverRequest1.sendRequestWithOKHttp();//里面有一个单独的线程
+
+        Log.e("requestWebToMainCabinet", Integer.toString(test1.size()));
+        Log.e("requestWebToMainCabinet", Integer.toString(test1.get(0).size()));
+
+
+        ArrayList<ArrayList<String>> test2 = new ArrayList<ArrayList<String>>();
+        test2 = serverRequest2.sendRequestWithOKHttp();//里面有一个单独的线程
+        Log.e("requestWebToMainDevice", Integer.toString(test2.size()));
+        Log.e("requestWebToMainDevice", Integer.toString(test2.get(0).size()));
     }
 }

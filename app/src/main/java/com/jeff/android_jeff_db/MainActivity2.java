@@ -59,7 +59,7 @@ public class MainActivity2 extends AppCompatActivity {
         initDevices();
         initMaps();
 
-        sendRequestWithOKHttp();
+        //sendRequestWithOKHttp();
     }
 
     private void queryDatabaseDevice() {
@@ -127,11 +127,12 @@ public class MainActivity2 extends AppCompatActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();
                     //Request request = new Request.Builder().url("https://www.baidu.com").build();//最终通过这个build方法展示出这个request，各种办法就包装在request中
-                    Request request = new Request.Builder().url("http://10.0.0.2/get_data.xml").build();//对于模拟器的本地地址
+                    Request request = new Request.Builder().url("http://10.0.2.2/get_data.xml").header("Connection", "close").build();//对于模拟器的本地地址
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
                     //Log.d("https", responseData);
 
+                    Log.e("jeff","start");
                     parseXMLWithPull(responseData);
 
                 } catch (Exception e) {
@@ -142,32 +143,47 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void parseXMLWithPull(String xmlData) {
+        //解析服务器返回的数据
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xmlPullParser = factory.newPullParser();
-            xmlPullParser.setInput(new StringReader(xmlData));
-            int eventType = xmlPullParser.getEventType();
+            xmlPullParser.setInput(new StringReader(xmlData));//将得到的数据传进去
+            int eventType = xmlPullParser.getEventType();//得到当前的解析事件
 
             String id = "";
             String name = "";
             String version = "";
 
             while (eventType != XmlPullParser.END_DOCUMENT){
-                String nodeName = xmlPullParser.getName();
+                String nodeName = xmlPullParser.getName();//得到当前结点的名字
                 switch (eventType){
                     //开始解析某个结点
                     case XmlPullParser.START_TAG:{
                         if("id".equals(nodeName)){
-                            id = xmlPullParser.nextText();
+                            id = xmlPullParser.nextText();//获得结点的具体内容
                         }
-                        //https://weread.qq.com/web/reader/7c532360718ff6317c5255dk32b321d024832bb90e89958
-                        //明天接着写
+                        else if("name".equals(nodeName)){
+                            name = xmlPullParser.nextText();
+                        }
+                        else if("version".equals(nodeName)){
+                            version = xmlPullParser.nextText();
+                        }
+                        break;
                     }
 
                     //完成解析某个结点
+                    case XmlPullParser.END_TAG:{
+                        if("app".equals(nodeName)){
+                            Log.d("xml","id is "+id);
+                            Log.d("xml","name is "+name);
+                            Log.d("xml","version is "+version);
+                        }
+                        break;
+                    }
+                    default:break;
                 }
+                eventType = xmlPullParser.next();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
