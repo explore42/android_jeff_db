@@ -61,184 +61,18 @@ public class MainActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.device_overview);//更改之后
 
-        //dbHelper = new JeffDatabaseHelper(this, "Device", null, versionID);//每次需要更改版本号，有两个地方需要改
-
-        //0422
         serverRequest1 = new ServerRequest(urlCabinet);//实例化
         serverRequest2 = new ServerRequest(urlDevice);
-        //ServerButton();
 
-        //createDatabase();
-        //addDatabase();
-        //queryDatabase();
-
-        //refreshDatabaseNew();//每次需要更改版本号
-        //initCabinets();
-
-        //0426
         List<CabinetPal> cabinetPals = LitePal.findAll(CabinetPal.class);//先查一下数据库里面有没有
         if(cabinetPals.size() == 0) {
-            ServerInit();//没有，就更新数据库
+            getDataFromServer();//没有，就更新数据库
         }
         initListFromServer();//要是有，就直接展示UI
         deleteDBPal();
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void createDatabase() {
-        Button createDBButton = (Button) findViewById(R.id.create_database);
-        createDBButton.setVisibility(View.VISIBLE);
-        createDBButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dbHelper.getWritableDatabase();
-            }
-        });
-    }
-
-    private void addDatabase() {
-        Button addData = (Button) findViewById(R.id.add_data);
-        addData.setVisibility(View.VISIBLE);
-        addData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-
-                for (int i = 0; i < outName.length; i++) {
-                    //Log.d("data","输入一个数据data");
-                    values.put("name", outName[i]);
-                    values.put("longitude", outLo[i]);
-                    values.put("latitude", outLa[i]);
-                    values.put("status", outStatus[i]);
-
-                    db.insert("Device", null, values);
-                    values.clear();
-                }
-            }
-        });
-    }
-
-    private void queryDatabase() {
-        Button queryData = (Button) findViewById(R.id.query_data);
-        queryData.setVisibility(View.VISIBLE);
-        queryData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                //all data
-                Cursor cursor = db.query("Device", null, null, null, null, null, null);
-                if (cursor.moveToFirst()) {
-                    do {
-                        //遍历全部对象
-                        @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
-                        @SuppressLint("Range") float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                        @SuppressLint("Range") float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                        @SuppressLint("Range") int status = cursor.getInt(cursor.getColumnIndex("status"));
-                        Log.d("DATABASE", "onClick: device name " + name);
-                        Log.d("DATABASE", "onClick: device longitude " + longitude);
-                        Log.d("DATABASE", "onClick: device latitude " + latitude);
-                        Log.d("DATABASE", "onClick: device status " + status);
-                    }
-                    while (cursor.moveToNext());
-                }
-                cursor.close();
-            }
-        });
-    }
-
-    private void initCabinets() {
-        //queryDatabaseToList();//改成不用按钮的版本
-        queryDatabaseCabinet();
-
-        for (int i = 0; i < deviceListName.size(); i++) {
-            deviceList.add(new Device(deviceListName.get(i), deviceListLo.get(i), deviceListLa.get(i), deviceListStatus.get(i)));
-        }
-
-        //RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        //更改之后
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_device_overview);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        DeviceAdapter adapter = new DeviceAdapter(deviceList);
-        recyclerView.setAdapter(adapter);
-
-        //返回设备的总数
-        Log.d("devices", Integer.toString(adapter.getItemCount()));
-        //TextView textView = (TextView) findViewById(R.id.textView_deviceNum);
-        //更改之后
-        TextView textView = (TextView) findViewById(R.id.textView_deviceNum_overview);
-        textView.setText(Integer.toString(adapter.getItemCount()));
-    }
-
-    private void queryDatabaseToList() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        //all data
-        Cursor cursor = db.query("Device", null, null, null, null, null, null);
-        if (cursor.moveToFirst()) {
-            do {
-                //遍历全部对象
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
-                @SuppressLint("Range") float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                @SuppressLint("Range") float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                @SuppressLint("Range") int status = cursor.getInt(cursor.getColumnIndex("status"));
-                Log.d("DATABASE", "onClick: device name " + name);
-                Log.d("DATABASE", "onClick: device longitude " + longitude);
-                Log.d("DATABASE", "onClick: device latitude " + latitude);
-                Log.d("DATABASE", "onClick: device status " + status);
-
-                //装入集合之中
-                deviceListName.add(name);
-                deviceListLo.add(Float.toString(longitude));
-                deviceListLa.add(Float.toString(latitude));
-                deviceListStatus.add(Integer.toString(status));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private void queryDatabaseCabinet() {
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        Cursor cursor = db.query("Cabinet", null, null, null, null, null, null);//all data
-        if (cursor.moveToFirst()) {
-            do {
-                //遍历全部对象
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex("name"));
-                @SuppressLint("Range") float longitude = cursor.getFloat(cursor.getColumnIndex("longitude"));
-                @SuppressLint("Range") float latitude = cursor.getFloat(cursor.getColumnIndex("latitude"));
-                @SuppressLint("Range") int status = cursor.getInt(cursor.getColumnIndex("status"));
-                //装入集合之中
-                deviceListName.add(name);
-                deviceListLo.add(Float.toString(longitude));
-                deviceListLa.add(Float.toString(latitude));
-                deviceListStatus.add(Integer.toString(status));
-            }
-            while (cursor.moveToNext());
-        }
-        cursor.close();
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //0422 通过服务器更新数据
-    private void ServerButton() {
-        Button button = (Button) findViewById(R.id.button_server_xml);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getDataFromServer();
-                initListFromServer();
-            }
-        });
-    }
-
-    //0426 通过服务器更新数据
-    private void ServerInit(){
-        getDataFromServer();
-
-    }
 
     private void getDataFromServer() {
         int maxRequest = 5;//最多请求5次
