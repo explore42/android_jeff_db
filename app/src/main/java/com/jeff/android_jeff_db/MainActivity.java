@@ -20,35 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    //0419 用这个实现数据的创建，加载数据到网页上
-    //https://developer.android.com/training/data-storage/sqlite?hl=zh-cn
-
-    //list的各种实现
-    //https://weread.qq.com/web/reader/7c532360718ff6317c5255dkc1632f5021fc16a5320f3dc
-
-    private JeffDatabaseHelper dbHelper;
-
-    private String[] data = {"apple", "banana", "orange", "Jeff"};
-    private List<Fruit> fruitList = new ArrayList<>();
     private List<Device> deviceList = new ArrayList<>();
 
-    //存放从数据库读出来的数据
-    private List<String> deviceListName = new ArrayList<String>();
-    private List<String> deviceListLo = new ArrayList<String>();
-    private List<String> deviceListLa = new ArrayList<String>();
-    private List<String> deviceListStatus = new ArrayList<String>();
-
-    //原来的变量
-    private String[] outName = {};
-    private String[] outLo = {};
-    private String[] outLa = {};
-    private String[] outStatus = {};
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //4022 用服务器更新数据
     private ServerRequest serverRequest1;
     private ServerRequest serverRequest2;
-    private int versionID = 15;//版本号
     //private String urlCabinet = "http://10.0.2.2/cabinet.xml";//对于模拟器的本地地址
     //private String urlDevice = "http://10.0.2.2/device.xml";
     private String urlCabinet = "http://192.168.18.133/cabinet.xml";//给手机访问用的
@@ -145,32 +121,6 @@ public class MainActivity extends AppCompatActivity {
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //0426 Pal db
-    private void createDBPal() {
-        Button createDB = findViewById(R.id.button_create_palDB);
-        createDB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LitePal.getDatabase();//建立数据库
-
-                /*
-                DevicePal devicePal = new DevicePal();
-                devicePal.setName("测试设备");
-                devicePal.setBelong("测试机柜1");
-                devicePal.setStatus("1");
-                devicePal.save();
-
-                List<DevicePal> devicePal2 = LitePal.findAll(DevicePal.class);
-                Log.e("Pal数据库", "获取成功");
-                Log.e("Pal数据库", Integer.toString(devicePal2.size()));
-
-                LitePal.deleteAll(DevicePal.class);
-                List<DevicePal> devicePal3 = LitePal.findAll(DevicePal.class);
-                Log.e("Pal数据库", "获取成功");
-                Log.e("Pal数据库", Integer.toString(devicePal3.size()));*/
-            }
-        });
-    }
-
     private void deleteDBPal() {
         Button deleteDB = findViewById(R.id.button_delete_db_pal);
         deleteDB.setOnClickListener(new View.OnClickListener() {
