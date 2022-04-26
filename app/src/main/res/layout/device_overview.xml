@@ -65,4 +65,30 @@
         android:text="服务器读取数据"
         app:layout_constraintStart_toStartOf="@+id/guideline18"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_da_update"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="更新数据库"
+        app:layout_constraintEnd_toStartOf="@+id/guideline19"
+        app:layout_constraintStart_toEndOf="@+id/button_server_xml"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/button_create_palDB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="创建Pal数据库"
+        app:layout_constraintStart_toStartOf="@+id/guideline18"
+        app:layout_constraintTop_toBottomOf="@+id/button_server_xml" />
+
+    <Button
+        android:id="@+id/button_delete_db_pal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="删除Pal的数据"
+        app:layout_constraintEnd_toStartOf="@+id/guideline19"
+        app:layout_constraintStart_toEndOf="@+id/button_create_palDB"
+        app:layout_constraintTop_toBottomOf="@+id/button_da_update" />
 </androidx.constraintlayout.widget.ConstraintLayout>

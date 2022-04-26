@@ -10,6 +10,7 @@ import org.xmlpull.v1.XmlPullParserFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -80,7 +81,8 @@ public class ServerRequest {
         ArrayList<ArrayList<String>> serverReturn = new ArrayList<ArrayList<String>>();
 
         public String url;
-        public MyCallable(String url){
+
+        public MyCallable(String url) {
             this.url = url;
         }
 
@@ -94,10 +96,10 @@ public class ServerRequest {
                 Response response = client.newCall(request).execute();//同步方式
                 String responseData = response.body().string();
 
-                if(url.equals("http://10.0.2.2/cabinet.xml")){
+                if (url.equals("http://10.0.2.2/cabinet.xml") || url.equals("http://192.168.18.133/cabinet.xml")) {
                     Log.e("OKHTTP", "开始解析cabinet");
                     serverReturn = parseXMLWithPullCabinet(responseData);
-                }else if (url.equals("http://10.0.2.2/device.xml")){
+                } else if (url.equals("http://10.0.2.2/device.xml") || url.equals("http://192.168.18.133/device.xml")) {
                     Log.e("OKHTTP", "开始解析device");
                     serverReturn = parseXMLWithPullDevice(responseData);
                 }

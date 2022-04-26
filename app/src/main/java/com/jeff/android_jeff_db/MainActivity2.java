@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.litepal.LitePal;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -45,21 +46,23 @@ public class MainActivity2 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
 
+        //从Intent中获得
         triggerName = getIntent().getStringExtra("trigger_name");
         triggerLo = getIntent().getFloatExtra("trigger_lo", 103.931f);//后面的是默认值
         triggerLa = getIntent().getFloatExtra("trigger_la", 30.758f);
         //Log.e("intent",triggerName);
-
-        TextView textView = (TextView) findViewById(R.id.textview_detial_cabinet_name);
+        TextView textView = (TextView) findViewById(R.id.textview_detial_cabinet_name);//对应的机柜名
         textView.setText(triggerName);
 
-        dbHelper = new JeffDatabaseHelper(this, "Device", null, 12);//每次需要更改版本号
+        /*
+        dbHelper = new JeffDatabaseHelper(this, "Device", null, 15);//每次需要更改版本号
 
         queryDatabaseDevice();
-        initDevices();
-        initMaps();
+        initDevices();*/
 
-        //sendRequestWithOKHttp();
+        //0426 从新的Pal数据库中查询数据
+        initListFromServer();
+        initMaps();
     }
 
     private void queryDatabaseDevice() {
@@ -103,6 +106,26 @@ public class MainActivity2 extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
+    private void initListFromServer(){
+        //实现对应设备的列表
+
+        //先查询数据库
+        List<DevicePal> devicePals = LitePal.findAll(DevicePal.class);
+        for (DevicePal devicePal: devicePals){
+            if(devicePal.getBelong().equals(triggerName)){
+                deviceList.add(new DeviceDetail(devicePal.getName(),devicePal.getBelong(),devicePal.getStatus()));
+            }
+        }
+
+        //再传入数据
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_device_detail);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+        DeviceDetailAdapter adapter = new DeviceDetailAdapter(deviceList);
+        recyclerView.setAdapter(adapter);
+    }
+
     private void initMaps() {
         locationMap = (WebView) findViewById(R.id.webview_maps);
         WebSettings webSettings = locationMap.getSettings();
@@ -115,77 +138,5 @@ public class MainActivity2 extends AppCompatActivity {
         locationMap.addJavascriptInterface(new WebAppInterface(this, triggerLo, triggerLa), "Android");//绑定到Jscript，创建名为 Android 的接口
 
         locationMap.loadUrl("file:///android_asset/web/index.html");
-    }
-
-    //发起网络请求
-    private void sendRequestWithOKHttp() {
-        //先开启了一个子线程
-        // 然后在子线程里使用OkHttp发出一条HTTP请求
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    OkHttpClient client = new OkHttpClient();
-                    //Request request = new Request.Builder().url("https://www.baidu.com").build();//最终通过这个build方法展示出这个request，各种办法就包装在request中
-                    Request request = new Request.Builder().url("http://10.0.2.2/get_data.xml").header("Connection", "close").build();//对于模拟器的本地地址
-                    Response response = client.newCall(request).execute();
-                    String responseData = response.body().string();
-                    //Log.d("https", responseData);
-
-                    Log.e("jeff","start");
-                    parseXMLWithPull(responseData);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    private void parseXMLWithPull(String xmlData) {
-        //解析服务器返回的数据
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            XmlPullParser xmlPullParser = factory.newPullParser();
-            xmlPullParser.setInput(new StringReader(xmlData));//将得到的数据传进去
-            int eventType = xmlPullParser.getEventType();//得到当前的解析事件
-
-            String id = "";
-            String name = "";
-            String version = "";
-
-            while (eventType != XmlPullParser.END_DOCUMENT){
-                String nodeName = xmlPullParser.getName();//得到当前结点的名字
-                switch (eventType){
-                    //开始解析某个结点
-                    case XmlPullParser.START_TAG:{
-                        if("id".equals(nodeName)){
-                            id = xmlPullParser.nextText();//获得结点的具体内容
-                        }
-                        else if("name".equals(nodeName)){
-                            name = xmlPullParser.nextText();
-                        }
-                        else if("version".equals(nodeName)){
-                            version = xmlPullParser.nextText();
-                        }
-                        break;
-                    }
-
-                    //完成解析某个结点
-                    case XmlPullParser.END_TAG:{
-                        if("app".equals(nodeName)){
-                            Log.d("xml","id is "+id);
-                            Log.d("xml","name is "+name);
-                            Log.d("xml","version is "+version);
-                        }
-                        break;
-                    }
-                    default:break;
-                }
-                eventType = xmlPullParser.next();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

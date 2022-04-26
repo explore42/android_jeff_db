@@ -27,11 +27,21 @@
     var pointDB = new BMap.Point(Android.getLo(), Android.getLa());
     map.centerAndZoom(pointDB, 15);
 
-    var marker = new BMap.Marker(pointDB);        // 创建标注
-    map.addOverlay(marker);                     // 将标注添加到地图中
+    //坐标转换完之后的回调函数
+    translateCallback = function (data){
+      if(data.status === 0) {
+        var marker = new BMap.Marker(data.points[0]);
+        map.addOverlay(marker);
+        map.setCenter(data.points[0]);
+      }
+    }
 
-    // 托点功能
-    //marker.enableDragging();
+     setTimeout(function () {
+        var convertor = new BMap.Convertor();
+        var pointArr = [];
+        pointArr.push(pointDB);
+        convertor.translate(pointArr, 1, 5, translateCallback)
+    }, 1000);
     </script>
 </body>
 </html>
