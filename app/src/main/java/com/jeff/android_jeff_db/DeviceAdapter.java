@@ -25,8 +25,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         TextView deviceLongitude;
         TextView deviceLatitude;
         TextView deviceStatus;
-
-        Button deviceMap;
+        TextView deviceInfo;
 
         //注册外层的点击事件
         View deviceView;
@@ -35,19 +34,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             super(itemView);
             deviceView = itemView;
 
-            //更改之前
-            //deviceName = (TextView) itemView.findViewById(R.id.device_name);
-            //deviceLongitude = (TextView) itemView.findViewById(R.id.device_longitude);
-            //deviceLatitude = (TextView) itemView.findViewById(R.id.device_latitude);
-            //deviceStatus = (TextView) itemView.findViewById(R.id.device_status);
-
-            //更改之后
             deviceName = (TextView) itemView.findViewById(R.id.device_name_overview);
             deviceLongitude = (TextView) itemView.findViewById(R.id.device_longitude_overview);
             deviceLatitude = (TextView) itemView.findViewById(R.id.device_latitude_overview);
             deviceStatus = (TextView) itemView.findViewById(R.id.device_status_overview);
-
-            deviceMap = (Button) itemView.findViewById(R.id.device_map_button);
+            deviceInfo = (TextView) itemView.findViewById(R.id.textView_cabinet_info);
         }
     }
 
@@ -57,9 +48,6 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
     @Override
     public DeviceAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        //View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_item, parent, false);
-
-        //更改之后
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.device_first, parent, false);
         ViewHolder holder = new ViewHolder(view);
 
@@ -95,18 +83,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
             }
         });
 
-        holder.deviceMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(),"进入地图",Toast.LENGTH_SHORT).show();
-            }
-        });
-
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DeviceAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {//展示内部的List
         Device device = mDeviceList.get(position);
         holder.deviceName.setText(device.getName());
         holder.deviceLongitude.setText(device.getLongitude());
@@ -121,6 +102,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         else {
             holder.deviceStatus.setBackgroundColor(Color.RED);
         }
+
+        holder.deviceInfo.setText(device.getInfo());
     }
 
     @Override

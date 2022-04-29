@@ -1,24 +1,19 @@
 package com.jeff.android_jeff_db;
 
+import android.graphics.SweepGradient;
 import android.util.Log;
-
-import androidx.annotation.NonNull;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -32,6 +27,7 @@ public class ServerRequest {
         public static ArrayList<String> serverLoClock = new ArrayList<String>();
         public static ArrayList<String> serverLaClock = new ArrayList<String>();
         public static ArrayList<String> serverStatusClock = new ArrayList<String>();
+        public static ArrayList<String> serverInfoClock = new ArrayList<String>();
         public static ArrayList<ArrayList<String>> serverTotalClock = new ArrayList<ArrayList<String>>();//把上述几个List合并
     }
 
@@ -40,6 +36,11 @@ public class ServerRequest {
         public static ArrayList<String> serverNameClock = new ArrayList<String>();
         public static ArrayList<String> serverBelongClock = new ArrayList<String>();
         public static ArrayList<String> serverStatusClock = new ArrayList<String>();
+
+        public static ArrayList<String> serverLoClock = new ArrayList<String>();
+        public static ArrayList<String> serverLaClock = new ArrayList<String>();
+        public static ArrayList<String> serverInfoClock = new ArrayList<String>();
+        public static ArrayList<String> serverWebsiteClock = new ArrayList<String>();
         public static ArrayList<ArrayList<String>> serverTotalClock = new ArrayList<ArrayList<String>>();//把上述几个List合并
     }
 
@@ -73,7 +74,7 @@ public class ServerRequest {
             e.printStackTrace();
             Log.e("OKHTTP", "错误");
         }
-        Log.e("OKHTTP", Integer.toString(result.size()));
+        Log.e("OKHTTP Request返回的数组大小", Integer.toString(result.size()));
         return (result);
     }
 
@@ -123,11 +124,11 @@ public class ServerRequest {
             String lo = "";
             String la = "";
             String status = "";
+            String info = "";
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String nodeName = xmlPullParser.getName();//得到当前结点的名字
-                switch (eventType) {
-                    //开始解析某个结点
+                switch (eventType) {//开始解析某个结点
                     case XmlPullParser.START_TAG: {//获得结点的具体内容
                         if ("name".equals(nodeName)) {
                             name = xmlPullParser.nextText();
@@ -137,20 +138,27 @@ public class ServerRequest {
                             la = xmlPullParser.nextText();
                         } else if ("status".equals(nodeName)) {
                             status = xmlPullParser.nextText();
+                        } else if ("info".equals(nodeName)) {
+                            info = xmlPullParser.nextText();
+                            //Log.e("request xml","取得info");
                         }
                         break;
                     }
 
-                    //完成解析某个结点
-                    case XmlPullParser.END_TAG: {
+                    case XmlPullParser.END_TAG: {//完成解析某个结点
                         if ("cabinet".equals(nodeName)) {
-                            //Log.d("xml", "name is " + name);
-                            //serverName.add(name);
                             synchronized (CabinetClock.lock) {//先加锁，后写入
                                 CabinetClock.serverNameClock.add(name);
                                 CabinetClock.serverLoClock.add(lo);
                                 CabinetClock.serverLaClock.add(la);
                                 CabinetClock.serverStatusClock.add(status);
+                                CabinetClock.serverInfoClock.add(info);
+
+                                name = "";
+                                lo = "";
+                                la = "";
+                                status = "";
+                                info = "";
                             }
                         }
                         break;
@@ -163,11 +171,12 @@ public class ServerRequest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        synchronized (CabinetClock.lock){
+        synchronized (CabinetClock.lock) {
             CabinetClock.serverTotalClock.add(CabinetClock.serverNameClock);
             CabinetClock.serverTotalClock.add(CabinetClock.serverLoClock);
             CabinetClock.serverTotalClock.add(CabinetClock.serverLaClock);
             CabinetClock.serverTotalClock.add(CabinetClock.serverStatusClock);
+            CabinetClock.serverTotalClock.add(CabinetClock.serverInfoClock);
         }
         return (CabinetClock.serverTotalClock);
     }
@@ -183,6 +192,10 @@ public class ServerRequest {
             String name = "";
             String belong = "";
             String status = "";
+            String lo = "";
+            String la = "";
+            String info = "";
+            String web = "";
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String nodeName = xmlPullParser.getName();//得到当前结点的名字
@@ -195,6 +208,14 @@ public class ServerRequest {
                             belong = xmlPullParser.nextText();
                         } else if ("status".equals(nodeName)) {
                             status = xmlPullParser.nextText();
+                        } else if ("lo".equals(nodeName)) {
+                            lo = xmlPullParser.nextText();
+                        }else if ("la".equals(nodeName)) {
+                            la = xmlPullParser.nextText();
+                        }else if ("info".equals(nodeName)) {
+                            info = xmlPullParser.nextText();
+                        }else if ("website".equals(nodeName)) {
+                            web = xmlPullParser.nextText();
                         }
                         break;
                     }
@@ -206,6 +227,18 @@ public class ServerRequest {
                                 DeviceClock.serverNameClock.add(name);
                                 DeviceClock.serverBelongClock.add(belong);
                                 DeviceClock.serverStatusClock.add(status);
+                                DeviceClock.serverLoClock.add(lo);
+                                DeviceClock.serverLaClock.add(la);
+                                DeviceClock.serverInfoClock.add(info);
+                                DeviceClock.serverWebsiteClock.add(web);
+
+                                name = "";
+                                belong = "";
+                                status = "";
+                                lo = "";
+                                la = "";
+                                info = "";
+                                web = "";
                             }
                         }
                         break;
@@ -218,10 +251,14 @@ public class ServerRequest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        synchronized (DeviceClock.lock){
+        synchronized (DeviceClock.lock) {
             DeviceClock.serverTotalClock.add(DeviceClock.serverNameClock);
             DeviceClock.serverTotalClock.add(DeviceClock.serverBelongClock);
             DeviceClock.serverTotalClock.add(DeviceClock.serverStatusClock);
+            DeviceClock.serverTotalClock.add(DeviceClock.serverLoClock);
+            DeviceClock.serverTotalClock.add(DeviceClock.serverLaClock);
+            DeviceClock.serverTotalClock.add(DeviceClock.serverInfoClock);
+            DeviceClock.serverTotalClock.add(DeviceClock.serverWebsiteClock);
         }
         return (DeviceClock.serverTotalClock);
     }

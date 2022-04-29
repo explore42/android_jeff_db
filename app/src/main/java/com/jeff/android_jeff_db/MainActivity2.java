@@ -1,30 +1,20 @@
 package com.jeff.android_jeff_db;
 
-import android.annotation.SuppressLint;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.litepal.LitePal;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity2 extends AppCompatActivity {
     private String triggerName;
@@ -57,12 +47,13 @@ public class MainActivity2 extends AppCompatActivity {
         initMaps();
     }
 
-    private void initListFromServer(){//实现对应设备的列表
+    private void initListFromServer() {//实现对应设备的列表
         //先查询数据库
         List<DevicePal> devicePals = LitePal.findAll(DevicePal.class);
-        for (DevicePal devicePal: devicePals){
-            if(devicePal.getBelong().equals(triggerName)){
-                deviceList.add(new DeviceDetail(devicePal.getName(),devicePal.getBelong(),devicePal.getStatus()));
+        for (DevicePal devicePal : devicePals) {
+            if (devicePal.getBelong().equals(triggerName)) {
+                //注意顺序
+                deviceList.add(new DeviceDetail(devicePal.getName(), devicePal.getBelong(), devicePal.getStatus(), devicePal.getLongitude(), devicePal.getLatitude(), devicePal.getInfo(), devicePal.getWebsite()));
             }
         }
 
@@ -72,10 +63,11 @@ public class MainActivity2 extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         DeviceDetailAdapter adapter = new DeviceDetailAdapter(deviceList);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));//分割线
         recyclerView.setAdapter(adapter);
     }
 
-    private void initMaps() {
+    private void initMaps() {//下方显示地图
         locationMap = (WebView) findViewById(R.id.webview_maps);
         WebSettings webSettings = locationMap.getSettings();
         webSettings.setUseWideViewPort(true);
@@ -84,7 +76,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         //interface
         locationMap.setWebViewClient(new WebViewClient());//用户点击的所有链接都会在您的 WebView 中加载
-        locationMap.addJavascriptInterface(new WebAppInterface(this, triggerLo, triggerLa), "Android");//绑定到Jscript，创建名为 Android 的接口
+        locationMap.addJavascriptInterface(new WebAppInterface(this, triggerLo, triggerLa,""), "Android");//绑定到Jscript，创建名为 Android 的接口
 
         locationMap.loadUrl("file:///android_asset/web/index.html");
     }

@@ -10,11 +10,13 @@ public class WebAppInterface {
     private Context mContext;
     private float Lo;
     private float La;
+    private String website;
 
-    public WebAppInterface(Context c,float Lo,float La) {
+    public WebAppInterface(Context c,float Lo,float La,String website) {
         mContext = c;
         this.Lo = Lo;
         this.La = La;
+        this.website = website;
     }//传入上下文
 
     @JavascriptInterface
@@ -25,5 +27,10 @@ public class WebAppInterface {
     @JavascriptInterface
     public float getLa(){
         return La;
+    }
+
+    @JavascriptInterface
+    public String getWebsite() {
+        return website;
     }
 }

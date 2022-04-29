@@ -5,12 +5,14 @@ public class Device {
     private String longitude;
     private String latitude;
     private String status;
+    private String info;
 
-    public Device(String name,String longitude,String latitude, String status){
+    public Device(String name,String longitude,String latitude, String status,String info){
         this.name = name;
         this.longitude = longitude;
         this.latitude = latitude;
         this.status = status;
+        this.info = info;
     }
 
     public String getName() {
@@ -27,5 +29,9 @@ public class Device {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getInfo() {
+        return info;
     }
 }

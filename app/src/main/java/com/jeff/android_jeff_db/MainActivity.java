@@ -1,9 +1,5 @@
 package com.jeff.android_jeff_db;
 
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         serverRequest2 = new ServerRequest(urlDevice);
 
         List<CabinetPal> cabinetPals = LitePal.findAll(CabinetPal.class);//先查一下数据库里面有没有
-        if(cabinetPals.size() == 0) {
+        if (cabinetPals.size() == 0) {
             getDataFromServer();//没有，就更新数据库
         }
         initListFromServer();//要是有，就直接展示UI
@@ -97,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
             cabinetPal.setLongitude(cabinetString.get(1).get(i));
             cabinetPal.setLatitude(cabinetString.get(2).get(i));
             cabinetPal.setStatus(cabinetString.get(3).get(i));
+            cabinetPal.setInfo(cabinetString.get(4).get(i));//info
             cabinetPals.add(cabinetPal);
         }
         LitePal.saveAll(cabinetPals);
@@ -106,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
             devicePal.setName(deviceString.get(0).get(i));
             devicePal.setBelong(deviceString.get(1).get(i));
             devicePal.setStatus(deviceString.get(2).get(i));
+
+            devicePal.setLongitude(deviceString.get(3).get(i));
+            devicePal.setLatitude(deviceString.get(4).get(i));
+            devicePal.setInfo(deviceString.get(5).get(i));
+            devicePal.setWebsite(deviceString.get(6).get(i));
             devicePals.add(devicePal);
         }
         LitePal.saveAll(devicePals);
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         List<CabinetPal> cabinetPals = LitePal.findAll(CabinetPal.class);
 
         for (int i = 0; i < cabinetPals.size(); i++) {
-            deviceList.add(new Device(cabinetPals.get(i).getName(), cabinetPals.get(i).getLongitude(), cabinetPals.get(i).getLatitude(), cabinetPals.get(i).getStatus()));
+            deviceList.add(new Device(cabinetPals.get(i).getName(), cabinetPals.get(i).getLongitude(), cabinetPals.get(i).getLatitude(), cabinetPals.get(i).getStatus(), cabinetPals.get(i).getInfo()));
         }
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_device_overview);
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
 
         DeviceAdapter adapter = new DeviceAdapter(deviceList);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
 
         //返回设备的总数
